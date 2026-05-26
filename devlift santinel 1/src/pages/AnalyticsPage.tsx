@@ -1,227 +1,188 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
-import {
-  AreaChart, Area, BarChart, Bar, Line,
-  ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, ComposedChart,
-} from 'recharts'
-import GlassCard from '../components/ui/GlassCard'
-import AIInsightPanel from '../components/ui/AIInsightPanel'
-import { Download } from 'lucide-react'
 
-const tabs = ['Revenue', 'Inventory', 'Customers', 'Forecasts']
-
-const revenueData = Array.from({ length: 30 }, (_, i) => {
-  const date = new Date()
-  date.setDate(date.getDate() - (29 - i))
-  return {
-    date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    actual: 2.0 + Math.sin(i * 0.4) * 0.5 + Math.random() * 0.4,
-    forecast: 2.0 + Math.sin(i * 0.4) * 0.5 + 0.1,
-    previous: 1.8 + Math.sin(i * 0.4 + 0.3) * 0.4 + Math.random() * 0.3,
-  }
-})
-
-const inventoryData = [
-  { name: 'Paracetamol', stock: 120, threshold: 200, reorder: 500 },
-  { name: 'Amoxicillin', stock: 340, threshold: 100, reorder: 300 },
-  { name: 'Vitamin C', stock: 560, threshold: 150, reorder: 400 },
-  { name: 'Ibuprofen', stock: 80, threshold: 100, reorder: 250 },
-  { name: 'Antimalarial', stock: 420, threshold: 200, reorder: 350 },
+const metrics = [
+  { label: 'TOTAL REVENUE (Q3)', value: '$1,248,302.00', change: '+12.4% vs prev', changeIcon: 'trending_up', color: 'text-primary' },
+  { label: 'ACTIVE AGENTS', value: '482 / 500', change: '96% Capacity', changeIcon: 'bolt', color: 'text-secondary' },
+  { label: 'PROCESSING COST', value: '$14,022.40', change: '-2.1% Optimization', changeIcon: 'trending_down', color: 'text-error' },
+  { label: 'SUCCESS RATE', value: '99.98%', change: 'Mission Critical', changeIcon: 'verified', color: 'text-primary' },
 ]
 
-const sentimentData = Array.from({ length: 14 }, (_, i) => ({
-  date: new Date(Date.now() - (13 - i) * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-  score: 4.0 + Math.sin(i * 0.6) * 0.3 + Math.random() * 0.2,
-}))
-
-const forecastData = [
-  { period: 'Next 7 Days', revenue: 'XAF 16.8M', lower: '15.2M', upper: '18.4M', confidence: 92 },
-  { period: 'Next 14 Days', revenue: 'XAF 34.1M', lower: '30.5M', upper: '37.8M', confidence: 87 },
-  { period: 'Next 30 Days', revenue: 'XAF 72.4M', lower: '64.1M', upper: '80.9M', confidence: 81 },
+const tableData = [
+  { region: 'North America (NA-East)', icon: 'public', flows: '1,244', latency: '12ms', efficiency: 92, status: 'OPTIMAL', statusColor: 'text-primary', statusBg: 'bg-primary/10' },
+  { region: 'Europe (EU-Central)', icon: 'public', flows: '892', latency: '48ms', efficiency: 74, status: 'OPTIMAL', statusColor: 'text-primary', statusBg: 'bg-primary/10' },
+  { region: 'Asia Pacific (AP-South)', icon: 'public', flows: '411', latency: '156ms', efficiency: 45, iconColor: 'text-secondary', status: 'DEGRADED', statusColor: 'text-secondary', statusBg: 'bg-secondary/10' },
 ]
 
 export default function AnalyticsPage() {
-  const [activeTab, setActiveTab] = useState('Revenue')
+  const [activePeriod, setActivePeriod] = useState('DAY')
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Hero Section */}
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-xl font-bold text-sentinel-text-primary">Business Analytics</h1>
-          <p className="text-sm text-sentinel-text-muted mt-1">Historical trends, forecasts, and AI-powered insights</p>
+          <h3 className="text-technical-xs text-secondary mb-2 tracking-[0.2em] uppercase">Enterprise Intelligence</h3>
+          <h1 className="text-display-lg text-on-surface">Analytics & Insights</h1>
         </div>
-        <button className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-sentinel-cyan/10 text-sentinel-cyan hover:bg-sentinel-cyan/20 transition-colors">
-          <Download size={14} /> Export
-        </button>
-      </div>
-
-      <div className="flex gap-2 border-b border-sentinel-border pb-2">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-xs font-medium rounded-lg transition-colors ${
-              activeTab === tab
-                ? 'bg-sentinel-cyan/10 text-sentinel-cyan border border-sentinel-cyan/20'
-                : 'text-sentinel-text-muted hover:text-sentinel-text-primary'
-            }`}
-          >
-            {tab}
+        <div className="flex gap-3">
+          <div className="flex bg-surface-container-low p-1 rounded-lg border border-outline-variant/30">
+            {['DAY', 'WEEK', 'MONTH'].map((p) => (
+              <button
+                key={p}
+                onClick={() => setActivePeriod(p)}
+                className={`px-4 py-1.5 text-technical-xs rounded transition-all ${
+                  activePeriod === p ? 'bg-primary text-on-primary-fixed shadow-[0_0_10px_rgba(0,212,255,0.2)]' : 'text-on-surface-variant hover:text-primary'
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <button className="bg-primary px-6 py-2 rounded-lg text-on-primary text-label-md flex items-center gap-2 glow-cyan hover:opacity-90 active:scale-95 transition-all">
+            <span className="material-symbols-outlined text-sm">download</span>
+            GENERATE REPORT
           </button>
+        </div>
+      </section>
+
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {metrics.map((m) => (
+          <div key={m.label} className="glass-panel p-6 rounded-xl flex flex-col gap-2">
+            <span className="text-technical-xs text-on-surface-variant">{m.label}</span>
+            <div className={`text-headline-md ${m.color}`}>{m.value}</div>
+            <div className={`text-technical-xs ${m.color} flex items-center gap-1`}>
+              <span className="material-symbols-outlined text-xs">{m.changeIcon}</span> {m.change}
+            </div>
+          </div>
         ))}
       </div>
 
-      {activeTab === 'Revenue' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
-            <GlassCard className="p-4">
-              <h3 className="text-sm font-semibold text-sentinel-text-primary mb-1">Revenue — Actual vs Forecast vs Previous</h3>
-              <p className="text-xs text-sentinel-text-muted mb-4">30-day view with AI forecast overlay</p>
-              <ResponsiveContainer width="100%" height={320}>
-                <ComposedChart data={revenueData}>
-                  <defs>
-                    <linearGradient id="actualGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.2} />
-                      <stop offset="100%" stopColor="#00D4FF" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1E2D40" />
-                  <XAxis dataKey="date" tick={{ fill: '#8892A4', fontSize: 9 }} axisLine={false} tickLine={false} interval={4} />
-                  <YAxis tick={{ fill: '#8892A4', fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}M`} />
-                  <Tooltip contentStyle={{ background: '#161B27', border: '1px solid #1E2D40', borderRadius: '8px', fontSize: '12px', color: '#FFFFFF' }} />
-                  <Area type="monotone" dataKey="previous" stroke="#7C5CFF" strokeWidth={1} fill="#7C5CFF" fillOpacity={0.05} strokeDasharray="4 4" />
-                  <Area type="monotone" dataKey="actual" stroke="#00D4FF" strokeWidth={2} fill="url(#actualGrad)" />
-                  <Line type="monotone" dataKey="forecast" stroke="#00FF88" strokeWidth={1.5} strokeDasharray="6 3" dot={false} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </GlassCard>
+      {/* Main Analytics Canvas */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Revenue Chart */}
+        <div className="lg:col-span-8 glass-panel rounded-xl p-6 flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h4 className="text-headline-md text-on-surface">Revenue Projection & Anomalies</h4>
+              <p className="text-body-md text-on-surface-variant">Agent-driven market predictive modeling</p>
+            </div>
+            <div className="flex items-center gap-4 text-technical-xs">
+              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-primary" /> PROJECTED</div>
+              <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-secondary" /> ACTUAL</div>
+            </div>
           </div>
-          <div className="space-y-4">
-            <AIInsightPanel />
-            <GlassCard className="p-4">
-              <h3 className="text-sm font-semibold text-sentinel-text-primary mb-3">Revenue Breakdown</h3>
-              <div className="space-y-3">
-                {[
-                  { label: 'Location 1 — Douala', value: 'XAF 1.1M', pct: 46, color: 'bg-sentinel-cyan' },
-                  { label: 'Location 2 — Yaoundé', value: 'XAF 0.8M', pct: 33, color: 'bg-sentinel-blue' },
-                  { label: 'Location 3 — Bastos', value: 'XAF 0.5M', pct: 21, color: 'bg-sentinel-purple' },
-                ].map((item) => (
-                  <div key={item.label}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-sentinel-text-primary">{item.label}</span>
-                      <span className="text-sentinel-text-secondary">{item.value}</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-sentinel-border overflow-hidden">
-                      <motion.div
-                        className={`h-full rounded-full ${item.color}`}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${item.pct}%` }}
-                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                      />
-                    </div>
+          <div className="flex-1 w-full min-h-[300px] bg-surface-container-lowest/50 rounded-lg relative overflow-hidden flex items-end px-4 gap-2">
+            <div className="absolute inset-0 grid grid-rows-5 pointer-events-none">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="border-b border-outline-variant/10" />
+              ))}
+            </div>
+            {[40, 55, 45, 70, 60, 80, 75, 90, 85].map((h, i) => (
+              <div key={i} className="flex-1 bg-primary/20 rounded-t-sm relative" style={{ height: `${h}%` }}>
+                <div className="absolute inset-x-0 bottom-0 bg-primary rounded-t" style={{ height: `${h * 0.8}%`, opacity: 0.5 + (i === 3 ? 0 : 0) }} />
+                {i === 3 && (
+                  <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-surface border border-secondary text-secondary text-[10px] px-2 py-1 rounded-full whitespace-nowrap">
+                    ANOMALY DETECTED +18%
                   </div>
-                ))}
+                )}
               </div>
-            </GlassCard>
+            ))}
+          </div>
+          <div className="mt-4 flex justify-between px-2 text-technical-xs text-on-surface-variant">
+            <span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span><span>18:00</span><span>20:00</span>
           </div>
         </div>
-      )}
 
-      {activeTab === 'Inventory' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <GlassCard className="p-4">
-            <h3 className="text-sm font-semibold text-sentinel-text-primary mb-4">Stock Levels vs Threshold</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={inventoryData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E2D40" />
-                <XAxis dataKey="name" tick={{ fill: '#8892A4', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: '#8892A4', fontSize: 10 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ background: '#161B27', border: '1px solid #1E2D40', borderRadius: '8px', fontSize: '12px', color: '#FFFFFF' }} />
-                <Bar dataKey="stock" fill="#00D4FF" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="threshold" fill="#FF6B35" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </GlassCard>
-          <GlassCard className="p-4">
-            <h3 className="text-sm font-semibold text-sentinel-text-primary mb-4">Depletion Forecasts</h3>
-            <div className="space-y-3">
+        {/* AI Insights */}
+        <div className="lg:col-span-4 flex flex-col gap-6">
+          <div className="glass-panel ai-border rounded-xl p-6 flex flex-col gap-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-2">
+              <span className="material-symbols-outlined text-secondary opacity-30 text-4xl">psychology</span>
+            </div>
+            <h4 className="text-label-md text-secondary uppercase tracking-widest">AI Command Intelligence</h4>
+            <div className="space-y-4">
+              <div className="bg-surface-container-lowest/50 p-4 rounded border border-outline-variant/20">
+                <p className="text-technical-sm leading-relaxed text-on-surface">
+                  <span className="text-secondary font-bold">ANALYSIS:</span> Significant traffic spike detected from EU-West-1 node. Revenue correlation suggests early holiday volume. Recommendation: Scale Agent clusters by 15%.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between text-technical-xs text-on-surface-variant">
+                  <span>CONFIDENCE SCORE</span>
+                  <span>98.4%</span>
+                </div>
+                <div className="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
+                  <div className="h-full bg-secondary w-[98%] shadow-[0_0_8px_#cabeff]" />
+                </div>
+              </div>
+              <button className="w-full py-2 border border-secondary text-secondary text-technical-xs rounded hover:bg-secondary/10 transition-colors uppercase">Execute Auto-Scale</button>
+            </div>
+          </div>
+
+          <div className="glass-panel rounded-xl p-6">
+            <h4 className="text-label-md text-on-surface mb-4">Inventory Telemetry</h4>
+            <div className="space-y-4">
               {[
-                { name: 'Ibuprofen', eta: '12 hours', status: 'critical' as const },
-                { name: 'Paracetamol', eta: '18 hours', status: 'critical' as const },
-                { name: 'Amoxicillin', eta: '4 days', status: 'warning' as const },
-                { name: 'Vitamin C', eta: '8 days', status: 'healthy' as const },
+                { label: 'Silicon Units', icon: 'inventory_2', value: '1,420', change: '▼', changeColor: 'text-error' },
+                { label: 'Logic Cores', icon: 'memory', value: '8,912', change: '▲', changeColor: 'text-primary' },
+                { label: 'Network Hubs', icon: 'router', value: '244', change: '=', changeColor: 'text-on-surface-variant' },
               ].map((item) => (
-                <div key={item.name} className="flex items-center justify-between p-3 rounded-lg bg-sentinel-bg/50 border border-sentinel-border">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-1.5 h-1.5 rounded-full ${
-                      item.status === 'critical' ? 'bg-red-400' : item.status === 'warning' ? 'bg-sentinel-orange' : 'bg-sentinel-green'
-                    }`} />
-                    <span className="text-xs text-sentinel-text-primary">{item.name}</span>
+                <div key={item.label} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded bg-surface-container-highest flex items-center justify-center">
+                      <span className="material-symbols-outlined text-primary text-sm">{item.icon}</span>
+                    </div>
+                    <span className="text-body-md">{item.label}</span>
                   </div>
-                  <span className={`text-xs font-medium ${
-                    item.status === 'critical' ? 'text-red-400' : item.status === 'warning' ? 'text-sentinel-orange' : 'text-sentinel-green'
-                  }`}>{item.eta}</span>
+                  <span className="text-technical-sm text-on-surface">{item.value} <span className={`${item.changeColor} text-xs`}>{item.change}</span></span>
                 </div>
               ))}
             </div>
-          </GlassCard>
+          </div>
         </div>
-      )}
+      </div>
 
-      {activeTab === 'Customers' && (
-        <GlassCard className="p-4">
-          <h3 className="text-sm font-semibold text-sentinel-text-primary mb-1">Customer Sentiment Trend</h3>
-          <p className="text-xs text-sentinel-text-muted mb-4">14-day aggregated sentiment from all channels</p>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={sentimentData}>
-              <defs>
-                <linearGradient id="sentimentGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#00FF88" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#00FF88" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1E2D40" />
-              <XAxis dataKey="date" tick={{ fill: '#8892A4', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <YAxis domain={[3, 5]} tick={{ fill: '#8892A4', fontSize: 10 }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: '#161B27', border: '1px solid #1E2D40', borderRadius: '8px', fontSize: '12px', color: '#FFFFFF' }} />
-              <Area type="monotone" dataKey="score" stroke="#00FF88" strokeWidth={2} fill="url(#sentimentGrad)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </GlassCard>
-      )}
-
-      {activeTab === 'Forecasts' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {forecastData.map((f, i) => (
-            <motion.div
-              key={f.period}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <GlassCard className="p-4 gradient-border">
-                <p className="text-xs text-sentinel-text-muted mb-2">{f.period}</p>
-                <p className="text-2xl font-bold text-sentinel-text-primary mb-1">{f.revenue}</p>
-                <div className="flex items-center gap-2 text-xs text-sentinel-text-muted mb-3">
-                  <span>Range: {f.lower} – {f.upper}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 rounded-full bg-sentinel-border overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full bg-sentinel-green"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${f.confidence}%` }}
-                      transition={{ duration: 1, delay: 0.5 }}
-                    />
-                  </div>
-                  <span className="text-xs font-mono text-sentinel-green">{f.confidence}%</span>
-                </div>
-                <p className="text-[10px] text-sentinel-text-muted mt-1">Confidence</p>
-              </GlassCard>
-            </motion.div>
-          ))}
+      {/* Node Performance Matrix */}
+      <div className="glass-panel rounded-xl overflow-hidden">
+        <div className="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+          <h4 className="text-headline-md text-on-surface">Node Performance Matrix</h4>
+          <span className="material-symbols-outlined text-on-surface-variant cursor-pointer">filter_list</span>
         </div>
-      )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-surface-container-low/50">
+              <tr>
+                {['Region Node', 'Active Flows', 'Latencey (ms)', 'Efficiency', 'Status'].map((h) => (
+                  <th key={h} className="px-6 py-4 text-technical-xs text-on-surface-variant uppercase tracking-widest">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline-variant/20">
+              {tableData.map((row) => (
+                <tr key={row.region} className="hover:bg-primary/5 transition-colors cursor-default">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <span className={`material-symbols-outlined ${row.iconColor || 'text-primary'}`}>{row.icon}</span>
+                      <span className="text-technical-sm">{row.region}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-technical-sm">{row.flows}</td>
+                  <td className="px-6 py-4 text-technical-sm">{row.latency}</td>
+                  <td className="px-6 py-4">
+                    <div className="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+                      <div className={`h-full ${row.status === 'OPTIMAL' ? 'bg-primary' : 'bg-secondary'} rounded-full`} style={{ width: `${row.efficiency}%` }} />
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 ${row.statusBg} ${row.statusColor} text-technical-xs rounded`}>{row.status}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }

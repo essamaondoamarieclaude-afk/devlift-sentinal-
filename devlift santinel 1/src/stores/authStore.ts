@@ -10,11 +10,9 @@ interface AuthStore extends AuthState {
 
 export interface SignupData {
   fullName: string
-  businessName: string
+  organization: string
   email: string
   password: string
-  industry: string
-  country: string
 }
 
 const mockUser: User = {
