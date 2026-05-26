@@ -1,95 +1,140 @@
-import { motion } from 'framer-motion'
-
-const workflows = [
-  { name: 'Auto Inventory Reorder', desc: 'Monitors stock levels and auto-creates POs when thresholds breached', active: true, runs: 147, last: '2m ago' },
-  { name: 'Revenue Anomaly Alert', desc: 'Flags unusual transaction patterns and routes to human approval queue', active: true, runs: 89, last: '10m ago' },
-  { name: 'Daily Sales Report', desc: 'Generates and emails daily sales summary to all managers at 18:00', active: true, runs: 104, last: '1d ago' },
-]
-
-const categories = [
-  {
-    label: 'Triggers',
-    items: ['Inventory Threshold', 'Revenue Drop', 'Time Schedule', 'Webhook'],
-  },
-  {
-    label: 'Conditions',
-    items: ['AND/OR Logic', 'Numeric Compare', 'Time Window'],
-  },
-  {
-    label: 'Actions',
-    items: ['Send WhatsApp', 'Create PO', 'Send Email', 'Generate Report'],
-  },
-]
+import { useState } from 'react'
 
 export default function WorkflowPage() {
+  const [simulating, setSimulating] = useState(false)
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-headline-md text-on-surface">Automation Workflows</h1>
-          <p className="text-body-md text-on-surface-variant mt-1">Visual workflow builder for autonomous operations</p>
+    <div className="absolute inset-0 flex flex-col -m-6 -mb-24 md:-m-10"
+      style={{
+        backgroundImage: 'radial-gradient(#1e2d40 1px, transparent 1px)',
+        backgroundSize: '32px 32px',
+      }}
+    >
+      {/* SVG Connections Layer */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+        <path d="M160 220 L240 220" fill="none" stroke="#3c494e" strokeWidth="2" />
+        <path
+          d="M380 220 C420 220, 420 140, 460 140"
+          fill="none"
+          stroke={simulating ? 'url(#cyan-grad)' : '#3c494e'}
+          strokeWidth="2"
+          className={simulating ? '' : ''}
+          style={simulating ? { strokeDasharray: '10', animation: 'dash 5s linear infinite' } : {}}
+        />
+        <path d="M380 220 C420 220, 420 300, 460 300" fill="none" stroke="#3c494e" strokeWidth="2" />
+        <defs>
+          <linearGradient id="cyan-grad" x1="0%" x2="100%" y1="0%" y2="0%">
+            <stop offset="0%" stopColor="#a8e8ff" stopOpacity="1" />
+            <stop offset="100%" stopColor="#00d4ff" stopOpacity="1" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* Node: Trigger */}
+      <div className="absolute left-12 top-40 w-44 glass-panel rounded-lg shadow-2xl cursor-grab overflow-hidden border-l-2 border-primary z-10">
+        <div className="bg-primary/10 px-3 py-2 flex items-center justify-between border-b border-outline-variant/20">
+          <span className="text-technical-xs text-primary tracking-tighter">TRG-902</span>
+          <span className="material-symbols-outlined text-[16px] text-primary">bolt</span>
         </div>
-        <button className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-primary text-on-primary hover:opacity-90 transition-opacity">
-          <span className="material-symbols-outlined text-sm">add</span> New Workflow
-        </button>
+        <div className="p-3">
+          <h3 className="text-label-md text-on-surface mb-1">High Latency</h3>
+          <p className="text-[10px] text-on-surface-variant leading-tight">System response &gt; 500ms in Node-01</p>
+        </div>
+        <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-surface border border-outline-variant rounded-full flex items-center justify-center">
+          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {workflows.map((wf, i) => (
-          <motion.div
-            key={wf.name}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="glass-panel p-4 rounded-xl"
+      {/* Node: Condition */}
+      <div className="absolute left-64 top-40 w-44 glass-panel rounded-lg shadow-2xl cursor-grab overflow-hidden border-l-2 border-secondary z-10">
+        <div className="bg-secondary/10 px-3 py-2 flex items-center justify-between border-b border-outline-variant/20">
+          <span className="text-technical-xs text-secondary tracking-tighter">CND-441</span>
+          <span className="material-symbols-outlined text-[16px] text-secondary">alt_route</span>
+        </div>
+        <div className="p-3">
+          <h3 className="text-label-md text-on-surface mb-1">Region Validation</h3>
+          <p className="text-[10px] text-on-surface-variant leading-tight">Check if traffic is US-EAST-1</p>
+        </div>
+        <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-surface border border-outline-variant rounded-full" />
+        <div className="absolute -right-2 top-1/4 w-4 h-4 bg-surface border border-outline-variant rounded-full flex items-center justify-center">
+          <div className="w-1.5 h-1.5 bg-secondary rounded-full" />
+        </div>
+        <div className="absolute -right-2 bottom-1/4 w-4 h-4 bg-surface border border-outline-variant rounded-full" />
+      </div>
+
+      {/* Node: Action 1 */}
+      <div className="absolute right-12 top-20 w-44 glass-panel rounded-lg shadow-2xl cursor-grab overflow-hidden border-l-2 border-primary-container z-10"
+        style={{ animation: 'pulse-glow 2s infinite ease-in-out' }}
+      >
+        <div className="bg-primary-container/10 px-3 py-2 flex items-center justify-between border-b border-outline-variant/20">
+          <span className="text-technical-xs text-primary-container tracking-tighter">ACT-001</span>
+          <span className="material-symbols-outlined text-[16px] text-primary-container">settings_input_component</span>
+        </div>
+        <div className="p-3">
+          <h3 className="text-label-md text-on-surface mb-1">Reroute Traffic</h3>
+          <p className="text-[10px] text-on-surface-variant leading-tight">Shift 40% load to Node-02</p>
+        </div>
+        <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-surface border border-outline-variant rounded-full" />
+      </div>
+
+      {/* Node: Action 2 */}
+      <div className="absolute right-12 bottom-40 w-44 glass-panel rounded-lg shadow-2xl cursor-grab overflow-hidden border-l-2 border-on-surface-variant z-10">
+        <div className="bg-surface-variant/20 px-3 py-2 flex items-center justify-between border-b border-outline-variant/20">
+          <span className="text-technical-xs text-on-surface-variant tracking-tighter">ACT-002</span>
+          <span className="material-symbols-outlined text-[16px] text-on-surface-variant">notifications_active</span>
+        </div>
+        <div className="p-3">
+          <h3 className="text-label-md text-on-surface mb-1">Notify Admin</h3>
+          <p className="text-[10px] text-on-surface-variant leading-tight">Dispatch Slack/Pager alert</p>
+        </div>
+        <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 bg-surface border border-outline-variant rounded-full" />
+      </div>
+
+      {/* Simulation Toolbar */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-4 px-6 py-3 glass-panel rounded-full shadow-2xl z-10"
+        style={{ borderColor: 'rgba(0, 212, 255, 0.2)' }}
+      >
+        <div className="flex items-center gap-3 pr-4 border-r border-outline-variant/30">
+          <button
+            onClick={() => setSimulating(!simulating)}
+            className="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-on-primary shadow-[0_0_15px_rgba(0,212,255,0.3)] active:scale-90 transition-all"
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${wf.active ? 'bg-primary/10' : 'bg-surface-variant'}`}>
-                  <span className={`material-symbols-outlined ${wf.active ? 'text-primary' : 'text-on-surface-variant'}`}>account_tree</span>
-                </div>
-                <div>
-                  <p className="text-body-lg font-semibold text-on-surface">{wf.name}</p>
-                  <p className="text-technical-xs text-on-surface-variant mt-0.5">{wf.desc}</p>
-                </div>
-              </div>
-              <span className={`px-2 py-0.5 text-technical-xs rounded ${wf.active ? 'bg-primary/10 text-primary' : 'bg-surface-variant text-on-surface-variant'}`}>
-                {wf.active ? 'Active' : 'Paused'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between pt-3 border-t border-outline-variant/20">
-              <div className="flex items-center gap-3 text-technical-xs text-on-surface-variant">
-                <span>{wf.runs} runs</span>
-                <span>Last: {wf.last}</span>
-              </div>
-              <button className="flex items-center gap-1 px-2 py-1 text-technical-xs rounded bg-surface-variant hover:bg-surface-variant/80 transition-colors text-on-surface-variant">
-                <span className="material-symbols-outlined text-sm">{wf.active ? 'pause' : 'play_arrow'}</span>
-                {wf.active ? 'Pause' : 'Resume'}
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="glass-panel p-8 rounded-xl text-center">
-        <div className="max-w-md mx-auto">
-          <h3 className="text-headline-md text-on-surface mb-2">Workflow Canvas</h3>
-          <p className="text-body-md text-on-surface-variant mb-4">
-            Drag and drop triggers, conditions, and actions to build powerful automation pipelines.
-          </p>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            {categories.map((cat) => (
-              <div key={cat.label} className="p-3 rounded-lg bg-surface-container-low border border-outline-variant/20">
-                <p className="text-label-md text-on-surface mb-2">{cat.label}</p>
-                {cat.items.map((item) => (
-                  <span key={item} className="block px-2 py-1 text-[10px] rounded bg-surface-variant/50 text-on-surface-variant mb-1 hover:bg-primary/10 hover:text-primary transition-colors cursor-grab">
-                    {item}
-                  </span>
-                ))}
-              </div>
-            ))}
+            <span className="material-symbols-outlined">{simulating ? 'stop' : 'play_arrow'}</span>
+          </button>
+          <div className="flex flex-col">
+            <span className="text-technical-xs text-on-surface-variant uppercase tracking-widest">Simulation</span>
+            <span className={`text-label-md ${simulating ? 'text-secondary' : 'text-primary'}`}>{simulating ? 'RUNNING' : 'READY'}</span>
           </div>
         </div>
+        <div className="flex gap-4">
+          <button className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+            <span className="material-symbols-outlined">history</span>
+            <span className="text-technical-xs">LOGS</span>
+          </button>
+          <button className="flex flex-col items-center gap-1 text-on-surface-variant hover:text-primary transition-colors">
+            <span className="material-symbols-outlined">save</span>
+            <span className="text-technical-xs">SAVE</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Floating Component Drawer */}
+      <div className="absolute top-20 right-4 flex flex-col gap-2 z-10">
+        <button className="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-primary shadow-lg"
+          style={{ borderColor: 'rgba(0, 212, 255, 0.3)' }}
+        >
+          <span className="material-symbols-outlined">add</span>
+        </button>
+        <button className="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-on-surface-variant shadow-lg"
+          style={{ borderColor: 'rgba(60, 73, 78, 0.3)' }}
+        >
+          <span className="material-symbols-outlined">zoom_in</span>
+        </button>
+        <button className="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-on-surface-variant shadow-lg"
+          style={{ borderColor: 'rgba(60, 73, 78, 0.3)' }}
+        >
+          <span className="material-symbols-outlined">layers</span>
+        </button>
       </div>
     </div>
   )
