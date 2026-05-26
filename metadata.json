@@ -1,0 +1,6 @@
+{
+  "name": "Sentinel Command",
+  "description": "Autonomous AI multi-agent business operations and intelligence command center.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
