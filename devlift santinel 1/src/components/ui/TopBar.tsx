@@ -1,3 +1,5 @@
+import { NavLink } from 'react-router-dom'
+
 export default function TopBar() {
 
   return (
@@ -7,9 +9,9 @@ export default function TopBar() {
         <h1 className="text-headline-md font-bold tracking-tight text-primary-container">Sentinel Command</h1>
       </div>
       <nav className="hidden md:flex items-center gap-8">
-        <a className="text-primary font-bold text-label-md cursor-pointer transition-colors duration-200" href="/">Dashboard</a>
-        <a className="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-md cursor-pointer" href="/agents">Agent Monitor</a>
-        <a className="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-md cursor-pointer" href="/workflows">Workflows</a>
+        <NavLink to="/" end className={({ isActive }) => `text-label-md cursor-pointer transition-colors duration-200 ${isActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Dashboard</NavLink>
+        <NavLink to="/agents" className={({ isActive }) => `text-label-md cursor-pointer transition-colors duration-200 ${isActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Agent Monitor</NavLink>
+        <NavLink to="/workflows" className={({ isActive }) => `text-label-md cursor-pointer transition-colors duration-200 ${isActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>Workflows</NavLink>
       </nav>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant/30">
