@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+supabase
+asyncpg
+psycopg2-binary
+python-dotenv
+pydantic[email]
+python-jose[cryptography]
+passlib[bcrypt]
+redis
+celery
+sqlalchemy
+# LLM
+google-cloud-aiplatform
+google-generativeai
+google-genai

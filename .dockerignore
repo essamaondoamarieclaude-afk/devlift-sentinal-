@@ -1,0 +1,44 @@
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment (secrets baked at deploy time via Secret Manager)
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.pid
+
+# Test / scratch files (not needed at runtime)
+test_*.py
+migrate_*.py
+seed_data.py
+check_users.py
+tests/
+
+# Docker
+Dockerfile
+.dockerignore
+cloud_run_deploy.sh
